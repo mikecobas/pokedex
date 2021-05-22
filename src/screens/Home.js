@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, ScrollView, View, Text, Image } from 'react-native'
-import { forEach, map, slice, concat } from 'lodash'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { map, concat } from 'lodash'
 import { getPokemonsApi } from '../util/api'
 import { Searchbar, Button } from 'react-native-paper'
 import GridPokemon from '../components/GridPokemon'
+import { i18n } from '../i18n/translate'
 
 export default function Home () {
 
@@ -22,6 +24,7 @@ export default function Home () {
                 setTotal(response.count)
                 setPokemons(response.results)
                 setListPokemons(response.results)
+                storeData(response.results)
             })()
         }
     }, [])
@@ -33,6 +36,9 @@ export default function Home () {
         setTotal(response.count)
         setPokemons(concat(pokemons, response.results))
         setListPokemons(concat(pokemons, response.results))
+        const getLocalData = await getData()
+        await storeData(concat(getLocalData, response.results))
+
     }
     const loadMore = () => {
         if (item < total) {
@@ -46,7 +52,23 @@ export default function Home () {
         console.log('item ', item)
 
     }
+    const storeData = async (value) => {
+        try {
+            const jsonValue = JSON.stringify(value)
+            await AsyncStorage.setItem('pokemons', jsonValue)
+        } catch (e) {
+            // saving error
+        }
+    }
 
+    const getData = async () => {
+        try {
+            const jsonValue = await AsyncStorage.getItem('@storage_Key')
+            return jsonValue != null ? JSON.parse(jsonValue) : null;
+        } catch (e) {
+            // error reading value
+        }
+    }
 
     const quickSearch = (text) => {
 
@@ -73,19 +95,21 @@ export default function Home () {
         <SafeAreaView>
             <StatusBar style="auto" />
             <Searchbar
-                placeholder="Search pokemon"
+                testID="search"
+                placeholder={i18n.t('search')}
                 style={{ marginHorizontal: 8, marginVertical: 8 }} onChangeText={(text) => quickSearch(text)} />
-            <ScrollView
+            {listPokemons && <ScrollView
+                testID="pokemons-container"
                 contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', marginVertical: 8, marginHorizontal: 4, alignItems: 'center', paddingBottom: 40 }}>
                 {map(listPokemons, (pokemon, index) => (
-                    <GridPokemon key={pokemon.name} item={pokemon} />
+                    <GridPokemon testID="pokemonGrid" key={pokemon.name} item={pokemon} />
 
                 ))
                 }
                 <View style={{ width: '100%', marginTop: 16 }}>
-                    {pokemons && pokemons.length != total && <Button style={{ flex: 1, marginVertical: 16, width: '100%' }} onPress={() => loadMore(item)}>Load more</Button>}
+                    {pokemons && pokemons.length != total && <Button testID="load-button" style={{ flex: 1, marginVertical: 16, width: '100%' }} onPress={() => loadMore(item)}>Load more</Button>}
                 </View>
-            </ScrollView>
+            </ScrollView>}
         </SafeAreaView>
     )
 }

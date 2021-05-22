@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, Image, ScrollView } from 'react-native'
 import { ProgressBar, Colors, Badge, Divider, ActivityIndicator, Title } from 'react-native-paper'
 import { forEach, map, slice, concat } from 'lodash'
 import { getPokemonDetail } from '../util/api'
+import { i18n } from '../i18n/translate'
 
 export default function Pokemon (props) {
     const { route } = props;
@@ -20,6 +21,9 @@ export default function Pokemon (props) {
 
     }, [params.id])
 
+    const transformText = (text) => {
+        return text.replace('-', '_')
+    }
     return (
         <>
             {detail && !loading &&
@@ -31,12 +35,12 @@ export default function Pokemon (props) {
                             style={styles.image} />
                         <View style={styles.types}>
                             {map(detail.types, (item) => (
-                                <Badge>{item.type.name.toUpperCase()}</Badge>
+                                <Badge style={styles.type}>{item.type.name.toUpperCase()}</Badge>
                             ))}
                         </View>
                         <View style={styles.types}>
-                            <Text >Height : {detail.height}</Text>
-                            <Text >Weight : {detail.weight}</Text>
+                            <Text style={styles.data}>{i18n.t('height')}: {detail.height}</Text>
+                            <Text style={styles.data}>{i18n.t('weight')}: {detail.weight}</Text>
                         </View>
                         <Text style={styles.name}>{detail.name.toUpperCase()}</Text>
 
@@ -45,16 +49,16 @@ export default function Pokemon (props) {
                     <ScrollView style={styles.statsContainer}>
 
 
-                        <Title>Stats</Title>
+                        <Title>{i18n.t('stats')}</Title>
                         {map(detail.stats, (item) => (
-                            <View style={{ flexDirection: 'row', marginVertical: 8, width: '100%' }}>
-                                <View style={{ width: '20%', paddingRight: 8, flexDirection: 'row', alignItems: 'center' }}>
-                                    <Text>{item.stat.name.toUpperCase()} :</Text>
+                            <View style={styles.statsRow}>
+                                <View style={styles.statsName}>
+                                    <Text>{i18n.t(transformText(item.stat.name))} :</Text>
                                 </View>
-                                <View style={{ width: '60%', justifyContent: 'center' }}>
+                                <View style={styles.progressContainer}>
                                     <ProgressBar progress={item.base_stat / 300} color={Colors.blue700} style={{ height: 8 }} />
                                 </View>
-                                <View style={{ width: '20%', flexDirection: 'row', alignItems: 'center' }}>
+                                <View style={styles.amount}>
 
                                     <Text style={{ marginHorizontal: 8 }}>{item.base_stat}</Text>
                                 </View>
@@ -62,10 +66,10 @@ export default function Pokemon (props) {
                             </View>
                         ))}
                         <Divider />
-                        <Title>Moves</Title>
+                        <Title>{i18n.t('moves')}</Title>
                         {map(detail.moves, (item, index) => (
-                            <View style={{ flexDirection: 'row', marginVertical: 8, width: '100%' }}>
-                                <View style={{ paddingRight: 8, flexDirection: 'row' }}>
+                            <View style={styles.movesRow}>
+                                <View style={styles.moveName}>
                                     <Text>{index + 1} {item.move.name.toUpperCase().replace('-', ' ')}</Text>
                                 </View>
 
@@ -100,6 +104,10 @@ const styles = StyleSheet.create({
     types: {
         flexDirection: 'row'
     },
+    data: {
+        fontSize: 12,
+        marginHorizontal: 4
+    },
     name: {
         fontSize: 24,
         fontWeight: '500',
@@ -108,6 +116,40 @@ const styles = StyleSheet.create({
     statsContainer: {
         width: '100%',
         paddingTop: 16,
-        marginHorizontal: 8
-    }
+        marginHorizontal: 8,
+        paddingBottom: 24,
+        marginBottom: 8
+    },
+    type: {
+        backgroundColor: Colors.grey300,
+        marginHorizontal: 4,
+        marginBottom: 4
+    },
+    statsRow: {
+        flexDirection: 'row',
+        marginVertical: 8,
+        width: '100%'
+    },
+    statsName: {
+        width: '20%',
+        paddingRight: 8,
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    progressContainer: {
+        width: '60%',
+        justifyContent: 'center'
+    },
+    amount: {
+        width: '20%', flexDirection: 'row', alignItems: 'center'
+    },
+    movesRow: {
+        flexDirection: 'row',
+        marginVertical: 8,
+        width: '100%'
+    },
+    moveName: {
+        paddingRight: 8,
+        flexDirection: 'row'
+    },
 })

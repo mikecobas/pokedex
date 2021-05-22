@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
-import App from './src/app';
 import AppNavigation from './src/navigation/AppNavigation'
 
 // const theme = {
@@ -13,7 +12,7 @@ import AppNavigation from './src/navigation/AppNavigation'
 //   },
 // };
 
-export default function Main () {
+export default function App () {
   return (
     <PaperProvider >
       <NavigationContainer>
