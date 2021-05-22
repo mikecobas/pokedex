@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
+import * as Network from 'expo-network';
 import { SafeAreaView, ScrollView, View, Text, Image } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { map, concat } from 'lodash'
@@ -11,6 +12,7 @@ import { i18n } from '../i18n/translate'
 export default function Home () {
 
     const [lastCount, setLastCount] = useState(0)
+    const [connected, setConnected] = useState(true)
     const [item, setItems] = useState(50)
     const [total, setTotal] = useState(0);
     const [pokemons, setPokemons] = useState(null)
@@ -18,15 +20,23 @@ export default function Home () {
     const [search, setSearch] = useState('')
 
     useEffect(() => {
-        if (item == 50) {
-            (async () => {
+
+        (async () => {
+            const network = await Network.getNetworkStateAsync();
+            setConnected(network.isConnected)
+            if (connected) {
                 const response = await getPokemonsApi(lastCount)
                 setTotal(response.count)
                 setPokemons(response.results)
                 setListPokemons(response.results)
                 storeData(response.results)
-            })()
-        }
+            } else {
+                const localResponse = await getData()
+                setPokemons(localResponse);
+                setListPokemons(localResponse)
+            }
+        })()
+
     }, [])
 
     const getList = async (item, lastCount) => {
@@ -63,7 +73,7 @@ export default function Home () {
 
     const getData = async () => {
         try {
-            const jsonValue = await AsyncStorage.getItem('@storage_Key')
+            const jsonValue = await AsyncStorage.getItem('pokemons')
             return jsonValue != null ? JSON.parse(jsonValue) : null;
         } catch (e) {
             // error reading value
@@ -107,7 +117,7 @@ export default function Home () {
                 ))
                 }
                 <View style={{ width: '100%', marginTop: 16 }}>
-                    {pokemons && pokemons.length != total && <Button testID="load-button" style={{ flex: 1, marginVertical: 16, width: '100%' }} onPress={() => loadMore(item)}>Load more</Button>}
+                    {pokemons && connected && pokemons.length != total && <Button testID="load-button" style={{ flex: 1, marginVertical: 16, width: '100%' }} onPress={() => loadMore(item)}>Load more</Button>}
                 </View>
             </ScrollView>}
         </SafeAreaView>
