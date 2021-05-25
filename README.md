@@ -20,3 +20,14 @@ El proyecto tiene como alcance los siguientes puntos:
 ### Pruebas 
 
 `npm run test`
+
+
+## ENDPOINTS
+
+Se consulta los endpoints
+
+`/pokemon` -> para obtener los datos del pokemon
+
+`/ability` -> para detallar las abilidades con descipción
+
+`/type` -> para detallar los types de cada pokemon
