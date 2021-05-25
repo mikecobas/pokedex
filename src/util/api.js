@@ -30,3 +30,31 @@ export async function getPokemonDetail (id) {
         return null
     }
 }
+
+
+export async function getTypeInfo (id) {
+    try {
+        const url = `${API_URL}type/${id}`
+
+        const response = await fetch(url)
+        const result = await response.json()
+        return result
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}
+
+export async function getAbility (id) {
+    try {
+        const url = `${API_URL}ability/${id}`
+
+        const response = await fetch(url)
+        const result = await response.json()
+        return result
+
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}

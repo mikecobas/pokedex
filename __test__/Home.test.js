@@ -108,7 +108,6 @@ describe('<Home />', () => {
         expect(component.queryAllByTestId('pokemons-container').length).toEqual(0);
         expect(await component.queryAllByTestId('pokemons-container')).toBeDefined();
         expect(await component.queryAllByTestId('pokemonGrid')).toBeDefined();
-
     })
 
 
