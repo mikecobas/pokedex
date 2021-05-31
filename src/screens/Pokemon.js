@@ -23,7 +23,6 @@ export default function Pokemon (props) {
             setDetail(response)
             setTypes(response.types)
             setLoading(false)
-
         })()
 
     }, [params.id])
@@ -143,15 +142,11 @@ export default function Pokemon (props) {
                     <ScrollView style={styles.statsContainer}>
                         <Title>Abilities</Title>
                         <View style={{ flexDirection: 'row' }}>
-                            {map(detail.abilities, (item, index) => (
-
+                            {detail.abilities && map(detail.abilities, (item, index) => (
 
                                 <TouchableOpacity key={index} onPress={() => getAbilityDetail(item.ability.name)}>
-                                    <Badge style={[styles.type, { marginHorizontal: 8 }]}>{item.ability.name} </Badge>
+                                    <Badge style={[styles.type, { marginHorizontal: 8, fontSize: 12 }]}>{item.ability.name.toUpperCase()} </Badge>
                                 </TouchableOpacity>
-
-
-
 
                             ))}
                         </View>
@@ -174,7 +169,7 @@ export default function Pokemon (props) {
                         <Divider />
                         <Title>{i18n.t('moves')}</Title>
                         {map(detail.moves, (item, index) => (
-                            <View style={styles.movesRow}>
+                            <View key={index} style={styles.movesRow}>
                                 <View style={styles.moveName}>
                                     <Text>{index + 1} {item.move.name.toUpperCase().replace('-', ' ')}</Text>
                                 </View>
@@ -269,7 +264,7 @@ export default function Pokemon (props) {
                             <List.AccordionGroup>
 
                                 <List.Accordion title="Pokemon List" id="7">
-                                    {(map(ability.pokemon, (data, index) => (
+                                    {ability && (map(ability.pokemon, (data, index) => (
                                         <List.Item title={data.pokemon.name} key={index} />
                                     )))}
                                 </List.Accordion>
