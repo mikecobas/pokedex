@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react'
+import { useTheme } from '@react-navigation/native'
 import { StyleSheet, View, Text, Image, ScrollView, Modal, SafeAreaView, TouchableOpacity } from 'react-native'
 import { ProgressBar, Colors, Badge, Divider, ActivityIndicator, Title, IconButton, List, Subheading, Paragraph } from 'react-native-paper'
 import { map } from 'lodash'
 import { getAbility, getPokemonDetail, getTypeInfo } from '../util/api'
 import { i18n } from '../i18n/translate'
+import { color } from 'react-native-reanimated'
 
 export default function Pokemon (props) {
+    const { colors } = useTheme()
     const { route } = props;
     const { params } = route;
     const [loading, setLoading] = useState(true);
@@ -117,22 +120,23 @@ export default function Pokemon (props) {
     return (
         <>
             {detail && !loading &&
-                <View style={styles.container}>
-                    <View style={styles.headerContainer}>
+                <View style={[styles.container, { backgroundColor: colors.background }]}>
+                    <View style={[styles.headerContainer, { backgroundColor: colors.backgroundSecondary }]}>
+                        <Text style={[styles.name, { color: colors.text }]}>{detail.name.toUpperCase()}</Text>
                         <Image source={{
                             uri: `${detail.sprites.front_default}`,
                         }}
-                            style={styles.image} />
+                            style={[styles.image]} />
                         <View>
-                            <Text style={styles.name}>{detail.name.toUpperCase()}</Text>
+
                             <View style={styles.types}>
                                 {types && map(types, (item, index) => (
                                     type(item.type, index)
                                 ))}
                             </View>
                             <View style={styles.types}>
-                                <Text style={styles.data}>{i18n.t('height')}: {detail.height}</Text>
-                                <Text style={styles.data}>{i18n.t('weight')}: {detail.weight}</Text>
+                                <Text style={[styles.data, { color: colors.text }]}>{i18n.t('height')}: {detail.height}</Text>
+                                <Text style={[styles.data, { color: colors.text }]}>{i18n.t('weight')}: {detail.weight}</Text>
                             </View>
 
                         </View>
@@ -153,15 +157,15 @@ export default function Pokemon (props) {
                         <Title style={{ paddingVertical: 8 }}>{i18n.t('stats')}</Title>
                         {map(detail.stats, (item, index) => (
                             <View key={index} style={styles.statsRow}>
-                                <View style={styles.statsName}>
-                                    <Text>{i18n.t(transformText(item.stat.name))} :</Text>
+                                <View style={[styles.statsName,]}>
+                                    <Text style={{ color: colors.text }}>{i18n.t(transformText(item.stat.name))} :</Text>
                                 </View>
                                 <View style={styles.progressContainer}>
-                                    <ProgressBar progress={item.base_stat / 300} color={Colors.blue700} style={{ height: 8 }} />
+                                    <ProgressBar progress={item.base_stat / 300} color={colors.success} style={{ height: 8 }} />
                                 </View>
                                 <View style={styles.amount}>
 
-                                    <Text style={{ marginHorizontal: 8 }}>{item.base_stat}</Text>
+                                    <Text style={{ marginHorizontal: 8, color:colors.text }}>{item.base_stat}</Text>
                                 </View>
 
                             </View>
@@ -171,7 +175,7 @@ export default function Pokemon (props) {
                         {map(detail.moves, (item, index) => (
                             <View key={index} style={styles.movesRow}>
                                 <View style={styles.moveName}>
-                                    <Text>{index + 1} {item.move.name.toUpperCase().replace('-', ' ')}</Text>
+                                    <Text style={{color:colors.text}}>{index + 1} {item.move.name.toUpperCase().replace('-', ' ')}</Text>
                                 </View>
 
 
@@ -183,55 +187,55 @@ export default function Pokemon (props) {
                         animationType='slide'
                         presentationStyle='pageSheet'
                     >
-                        {typeDetail && <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center' }}>
+                        {typeDetail && <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center', backgroundColor:colors.background }}>
                             <Title>{typeDetail.name.toUpperCase()}</Title>
                             <IconButton icon="close"
-                                color={Colors.black}
+                                color={colors.text}
                                 size={20}
                                 onPress={closeModal}
                             />
                         </View>}
 
-                        <ScrollView style={{ padding: 20 }}>
+                        <ScrollView style={{ padding: 20, backgroundColor:colors.backgroundSecondary }}>
                             <Subheading>Damage relations</Subheading>
-                            {typeDetail?.damage_relation && <List.AccordionGroup>
-                                {typeDetail?.damage_relations?.no_damage_to && <List.Accordion title="No damage to" id="1">
+                            {typeDetail && <List.AccordionGroup>
+                                 <List.Accordion title="No damage to" id="1">
                                     {(map(typeDetail.damage_relations.no_damage_to, (data, index) => (
-                                        <List.Item title={data.name} key={index} />
+                                        <List.Item title={data.name} key={index} style={{color:colors.text}}/>
                                     )))}
-                                    {typeDetail.damage_relations?.no_damage_to == 0 && <Text style={styles.noInfo}>No related information</Text>}
-                                </List.Accordion>}
-                                {typeDetail.damage_relations?.no_damage_from && <List.Accordion title="No damage from" id="2">
+                                    {typeDetail.damage_relations?.no_damage_to == 0 && <Text style={[styles.noInfo, {color:colors.text}]}>No related information</Text>}
+                                </List.Accordion>
+                                <List.Accordion title="No damage from" id="2">
                                     {(map(typeDetail.damage_relations.no_damage_from, (data, index) => (
-                                        <List.Item title={data.name} key={index} />
+                                        <List.Item title={data.name} key={index} style={{color:colors.text}}/>
                                     )))}
                                     {typeDetail.damage_relations?.no_damage_from == 0 && <Text style={styles.noInfo}>No related information</Text>}
-                                </List.Accordion>}
+                                </List.Accordion>
 
-                                {typeDetail.damage_relations?.half_damage_to && <List.Accordion title="Half damage to" id="3">
+                              <List.Accordion title="Half damage to" id="3">
                                     {(map(typeDetail.damage_relations.half_damage_to, (data, index) => (
-                                        <List.Item title={data.name} key={index} />
+                                        <List.Item title={data.name} key={index}  style={{color:colors.text}}/>
                                     )))}
                                     {typeDetail.damage_relations?.half_damage_to == 0 && <Text style={styles.noInfo}>No related information</Text>}
-                                </List.Accordion>}
-                                {typeDetail.damage_relations?.half_damage_from && <List.Accordion title="Half damage from" id="4">
+                                </List.Accordion>
+                               <List.Accordion title="Half damage from" id="4">
                                     {(map(typeDetail.damage_relations.half_damage_from, (data, index) => (
-                                        <List.Item title={data.name} key={index} />
+                                        <List.Item title={data.name} key={index} style={{color:colors.text}}/>
                                     )))}
                                     {typeDetail.damage_relations?.half_damage_from == 0 && <Text style={styles.noInfo}>No related information</Text>}
-                                </List.Accordion>}
-                                {typeDetail.damage_relations?.double_damage_to && <List.Accordion title="Double damage to" id="5">
+                                </List.Accordion>
+                              <List.Accordion title="Double damage to" id="5">
                                     {(map(typeDetail.damage_relations.double_damage_to, (data, index) => (
-                                        <List.Item title={data.name} key={index} />
+                                        <List.Item title={data.name} key={index} style={{color:colors.text}} />
                                     )))}
                                     {typeDetail.damage_relations?.double_damage_to == 0 && <Text style={styles.noInfo}>No related information</Text>}
-                                </List.Accordion>}
-                                {typeDetail.damage_relations?.double_damage_from && <List.Accordion title="Double damage from" id="6">
+                                </List.Accordion>
+                              <List.Accordion title="Double damage from" id="6">
                                     {(map(typeDetail.damage_relations.double_damage_from, (data, index) => (
-                                        <List.Item title={data.name} key={index} />
+                                        <List.Item title={data.name} key={index} style={{color:colors.text}}/>
                                     )))}
-                                    {typeDetail.damage_relations?.double_damage_from == 0 && <Text style={styles.noInfo}>No related information</Text>}
-                                </List.Accordion>}
+                                    {typeDetail.damage_relations?.double_damage_from.length === 0 && <Text style={styles.noInfo}>No related information</Text>}
+                                </List.Accordion>
 
 
 
@@ -243,15 +247,15 @@ export default function Pokemon (props) {
                         animationType='slide'
                         presentationStyle='pageSheet'
                     >
-                        {ability && <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center' }}>
+                        {ability && <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center', backgroundColor:colors.background }}>
                             <Title>{ability.name.toUpperCase()}</Title>
                             <IconButton icon="close"
-                                color={Colors.black}
+                                color={colors.text}
                                 size={20}
                                 onPress={closeModal}
                             />
                         </View>}
-                        <View style={{ padding: 20 }}>
+                        <View style={{ padding: 20, backgroundColor:colors.backgroundSecondary }}>
                             <Subheading>Short Effect</Subheading>
                             <Paragraph>{ability?.effect_entries[0].short_effect}</Paragraph>
                             <Divider style={{ marginVertical: 8 }} />
@@ -259,13 +263,13 @@ export default function Pokemon (props) {
                             <Paragraph>{ability?.effect_entries[0].effect}</Paragraph>
                         </View>
 
-                        <ScrollView style={{ padding: 20 }}>
+                        <ScrollView style={{ padding: 20, backgroundColor:colors.backgroundSecondary }}>
 
                             <List.AccordionGroup>
 
                                 <List.Accordion title="Pokemon List" id="7">
                                     {ability && (map(ability.pokemon, (data, index) => (
-                                        <List.Item title={data.pokemon.name} key={index} />
+                                        <List.Item title={data.pokemon.name.toUpperCase()} key={index}/>
                                     )))}
                                 </List.Accordion>
 
@@ -296,16 +300,15 @@ const styles = StyleSheet.create({
     headerContainer: {
         alignItems: 'center',
         padding: 4,
-        backgroundColor: '#fff',
-        flexDirection: 'row'
     },
     image: {
-        width: 200,
-        height: 200,
+        width: 180,
+        height: 180,
         resizeMode: 'contain'
     },
     types: {
-        flexDirection: 'row'
+        flexDirection: 'row',
+        justifyContent:'center'
     },
     data: {
         fontSize: 12,
@@ -314,7 +317,10 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 24,
         fontWeight: '500',
-        marginVertical: 8
+        marginVertical: 8,
+        paddingHorizontal: 8,
+        textAlign: 'left',
+        width: '100%'
     },
     statsContainer: {
         width: '100%',

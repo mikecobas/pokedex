@@ -47,7 +47,6 @@ i18n.translations = {
 // Set the locale once at the beginning of your app.
 
 i18n.locale = Localization.locale;
-console.log(i18n.locale);
 i18n.fallbacks = true;
 
 export {

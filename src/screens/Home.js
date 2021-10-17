@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import * as Network from 'expo-network';
-import { SafeAreaView, ScrollView, View, Text, Image } from 'react-native'
+import { SafeAreaView, ScrollView, View, Text, Image, TextInput } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { map, concat } from 'lodash'
 import { getPokemonsApi } from '../util/api'
 import { Searchbar, Button } from 'react-native-paper'
 import GridPokemon from '../components/GridPokemon'
 import { i18n } from '../i18n/translate'
+import { useTheme } from 'react-native-paper';
 
 export default function Home () {
-
+    const {colors, theme} = useTheme()
     const [lastCount, setLastCount] = useState(0)
     const [connected, setConnected] = useState(true)
     const [item, setItems] = useState(50)
@@ -37,7 +38,7 @@ export default function Home () {
             }
         })()
 
-    }, [])
+    }, [theme])
 
     const getList = async (item, lastCount) => {
         setLastCount(lastCount += 50)
@@ -54,12 +55,12 @@ export default function Home () {
         if (item < total) {
 
             getList(50, lastCount)
-            console.log('count ', lastCount)
+           // console.log('count ', lastCount)
         } else {
             setLastCount(total)
-            console.log('item ', item)
+          //  console.log('item ', item)
         }
-        console.log('item ', item)
+       // console.log('item ', item)
 
     }
     const storeData = async (value) => {
@@ -103,11 +104,12 @@ export default function Home () {
 
     return (
         <SafeAreaView>
-            <StatusBar style="auto" />
-            <Searchbar
+            <StatusBar style={theme === 'light'? 'dark': 'light'} />
+            <TextInput
                 testID="search"
                 placeholder={i18n.t('search')}
-                style={{ marginHorizontal: 8, marginVertical: 8 }} onChangeText={(text) => quickSearch(text)} />
+                placeholderTextColor='#999'
+                style={{ marginHorizontal: 8, marginVertical: 8, borderWidth:0.5,height:40, borderRadius:8, padding:8}} onChangeText={(text) => quickSearch(text)} />
             {listPokemons && <ScrollView
                 testID="pokemons-container"
                 contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', marginVertical: 8, marginHorizontal: 4, alignItems: 'center', paddingBottom: 40 }}>
